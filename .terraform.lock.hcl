@@ -2,20 +2,22 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/hashicorp/oci" {
-  version     = "4.39.0"
-  constraints = "4.39.0"
+  version     = "4.40.0"
+  constraints = "4.40.0"
   hashes = [
-    "h1:DwAA/NCYIO2HTpzxjKBieehVPtodOvlZK2M0lR6OEmA=",
-    "zh:123b1cfc02e970294ecee5df671dfae7fa3942ab9e77aa3077032270cc8d17cd",
-    "zh:20cd659c95b241b9e138b8bd283c46b5ab7bea60fe93fd11370a696a12ae12e1",
-    "zh:20ff1d3b58a9540a90697e3484912d55152f36a4893aa16afe1fa93975559a4a",
-    "zh:32e6a7af3113a391d98cd11f5c1d7c4453d43b1837b1fdee4e54838b0a2e9d50",
-    "zh:71da5fe8efd2f75d50f5cd57acfff0dc8fb5c09685d16b2f998bb4dae2075083",
-    "zh:8465205db2726003875959524ac665a7194919a3ca288e7374eac11ad7970098",
-    "zh:adf2b91b7c48091d49e6a7954e0e8fcc3087148ea7f0a584008fdd05c8ab7965",
-    "zh:c6b6097820df5d68345dd875f9cad588dbdc0a9191b2c7d2d165b83a3304325e",
-    "zh:cf53a77562cc363d2c8ba5a217416564efde7227e72758566f0611ec999b6e46",
-    "zh:dce7910d1afb03a3e56fe6b4ced15def8be5aff648ed49d62fed873c98bc97b6",
+    "h1:9AVhKj00fO3MGfFPG/HT3kojLW3NZWIgpJJq26WC8Sc=",
+    "h1:T1uQ7j1FnL+U7Ob8AcmWlUzjMB6Zlxy7uV1BJNuhVas=",
+    "h1:gMlxekZi7Qmmosp5ZA3CnQPxxhbmns3K0C617ZaJ+Wo=",
+    "zh:0d839743e27cb56c1af238291c100edb52974e34bbdae2e08eaac765521037f2",
+    "zh:1ee5a0d8559af135eae9977e21c1308a9fdcb727b39b833a484749d5a0255867",
+    "zh:2746ad3d492f6ee2eca42cf61ec43cd68e6d205dd7992ecee3ca935d3ece68df",
+    "zh:6c9faa73ca85e9be376b224411ecad8e2f8923365ecab9409afb9eee2bd4d027",
+    "zh:740cc1bce34269ba367a9a85cc168944a7211b416c5d01847dd6301159e64cc2",
+    "zh:759551b10d4f1488e72a29d119c63d5a7834ca729e008332cfb2524fe5bdce9f",
+    "zh:b7325901a0edf896943bb0efa885629e7c193f703b49c8b4518fda69c39286f9",
+    "zh:c733d120a33b71b260dc105c054963ba19bb9490a3a8613a8bcb26030dc7b31e",
+    "zh:e4d6c60c93068ee699e3d1b1d716219d848a602b3c5f5a9b74699e6e2c2e27c3",
+    "zh:f1e97760ffa5c23f5b5a75c81ddb3821ba838ed33b830787c95aa16407595313",
   ]
 }
 
@@ -23,6 +25,8 @@ provider "registry.terraform.io/hashicorp/random" {
   version     = "3.1.0"
   constraints = "3.1.0"
   hashes = [
+    "h1:BZMEPucF+pbu9gsPk0G0BHx7YP04+tKdq2MrRDF1EDM=",
+    "h1:EPIax4Ftp2SNdB9pUfoSjxoueDoLc/Ck3EUoeX0Dvsg=",
     "h1:rKYu5ZUbXwrLG1w81k7H3nce/Ys6yAxXhWcbtk36HjY=",
     "zh:2bbb3339f0643b5daa07480ef4397bd23a79963cc364cdfbb4e86354cb7725bc",
     "zh:3cd456047805bf639fbf2c761b1848880ea703a054f76db51852008b11008626",

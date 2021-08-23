@@ -40,6 +40,10 @@ resource "oci_core_vcn" "inlets-vcn" {
   cidr_block = "10.0.0.0/16"
   compartment_id = oci_identity_compartment.inlets-exit-node.id
   dns_label = format("vnc%s", local.dns_label)
+  display_name = "inlets-vcn"
+  depends_on = [
+    oci_identity_compartment.inlets-exit-node
+  ]
 }
 
 resource "oci_core_subnet" "inlets-subnet" {
@@ -124,6 +128,9 @@ resource "oci_core_instance" "inlets-ubuntu-instance" {
     user_data = base64encode(templatefile("${path.module}/startup/startup.sh", {
       authToken = local.auth_token,
       version = var.inlets-version
+      promUrl = var.prom-url
+      promId = var.prom-id
+      promPW = var.prom-pw
     }))
     ssh_authorized_keys = file(var.ssh_public_key)
   }

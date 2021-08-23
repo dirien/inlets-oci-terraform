@@ -1,6 +1,173 @@
 ![Oracle Cloud Infrastructure](https://img.shields.io/badge/Oracle_Cloud_Infrastructure-F80000?style=for-the-badge&logo=oracle&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=Terraform&logoColor=white)
 
-# How to run an inlets exit-server on Oracle Cloud Infrastructure
+# How to run an inlets exit server on Oracle Cloud Infrastructure - Update: With Grafana
+
+This is the update of the existing how-to article, about running an exit server on Oracles Cloud Infrastructure.
+
+This time, we are ready for the upcoming major update of Inlets v0.9.0. We have finally the opportunity to measure and
+monitor your inlets tunnels. [Alex Ellis](https://twitter.com/alexellisuk) covered all the upcoming new functionalities
+in his own blog [post](https://inlets.dev/blog/2021/08/18/measure-and-monitor.html). So go and check this out.
+
+Here, I want to focus only on the Prometheus part of inlets pro v0.9.0.
+
+So what did change in the code? Nothing on the infrastructure side. We still run on OCI, the only difference is that we
+now deploy in the cloud-init the Grafana agent to use the [Grafana Cloud](https://grafana.com/products/cloud/).
+
+## Grafana Cloud
+
+_What is the Grafana Cloud?_
+
+> Grafana Cloud is a composable observability platform, integrating metrics, traces and logs with Grafana. Leverage the best open source observability software – including Prometheus, Loki, and Tempo – without the overhead of installing, maintaining, and scaling your observability stack.
+
+And they offer a free tier, which is absolutely perfect for us to use with our inlets exit nodes. The free tier
+includes:
+
+- 10,000 series for Prometheus or Graphite metrics
+- 50 GB of logs
+- 50 GB of traces
+- 14 days retention for metrics, logs and traces
+- Access for up to 3 team members
+
+So create an account.
+
+### Grafana Agent
+
+The Grafana Agent collects observability data and sends it to Grafana Cloud. Once the agent is deployed to your hosts,
+it collects and sends Prometheus-style metrics and log data using a pared-down Prometheus collector.
+
+The Grafana Agent is designed for easy installation and updates. It uses a subset of Prometheus code features to
+interact with hosted metrics, specifically:
+
+- Service discovery
+- Scraping
+- Write ahead log (WAL)
+- Remote writing
+
+Along with this, the agent typically uses less memory than scraping metrics using Prometheus.
+
+### API Key
+
+After you created an account, we need to get the values for the three new variables the updated `terraform` script
+needs:
+
+````terraform
+prom-id = xxx
+prom-pw = xxx
+prom-url = xxx
+````
+
+Just follow this instruction  https://grafana.com/docs/grafana-cloud/reference/create-api-key/ to get the `API key` we
+going to use as `prom-pw`
+
+The `prom-id` and `prom-url`, we find both in the same spot in your account details page int the prometheus details:
+
+![grafana-cloud-1.png](img/grafana-cloud-1.png)
+
+Click on `Details`:
+
+![grafana-cloud-2.png](img/grafana-cloud-2.png)
+
+Grab the Remote Write Endpoint and Instance ID.
+
+### Agent Config.
+
+Here is the full agent config, where are going to use. I will go more into the details, for the special points.
+
+```yaml
+server:
+  log_level: info
+  http_listen_port: 12345
+prometheus:
+  wal_directory: /tmp/wal
+  global:
+    scrape_interval: 60s
+  configs:
+    - name: agent
+      scrape_configs:
+        - job_name: 'http-tunnel'
+          static_configs:
+            - targets: [ 'localhost:8123' ]
+          scheme: https
+          authorization:
+            type: Bearer
+            credentials: ${authToken}
+          tls_config:
+            insecure_skip_verify: true
+      remote_write:
+        - url: ${promUrl}
+          basic_auth:
+            username: ${promId}
+            password: ${promPW}
+
+integrations:
+  agent:
+    enabled: true
+
+  prometheus_remote_write:
+    - url: ${promUrl}
+      basic_auth:
+        username: ${promId}
+        password: ${promPW}
+```
+
+Inlets scraping config
+
+```yaml
+...
+scrape_configs:
+  - job_name: 'http-tunnel'
+    static_configs:
+      - targets: [ 'localhost:8123' ]
+    scheme: https
+    authorization:
+      type: Bearer
+      credentials: ${authToken}
+    tls_config:
+      insecure_skip_verify: true
+...
+```
+
+This section is directly from the how-to of [Alex](https://inlets.dev/blog/2021/08/18/measure-and-monitor.html) I just
+substituted the credentials with a template variable.
+
+```yaml
+...
+remote_write:
+  - url: ${promUrl}
+    basic_auth:
+      username: ${promId}
+      password: ${promPW}
+...
+prometheus_remote_write:
+  - url: ${promUrl}
+    basic_auth:
+      username: ${promId}
+      password: ${promPW}
+```
+
+We're going to use here the remote write functionality. The Grafana Agent, will push any collected metrics, to our
+central Prometheus in the Grafana cloud. This will all done via `pushing` the scraped metrics. Keep this in mind, as
+this is a major difference to a classic prometheus installation you may have worked with.
+
+I highly recommend you watch following YouTube
+video [The Future is Bright, the Future is Prometheus Remote Write - Tom Wilkie, Grafana Labs](https://www.youtube.com/watch?v=vMeCyX3Y3HY)
+
+That's it, with the new bits. Now we can deploy the whole stack via:
+
+```bash
+terraform apply --auto-approve 
+...
+terraform output inlets-connection-string 
+```
+
+When you log into Grafana, you can now start to display your inlets metrics:
+
+![grafana-cloud-3.png](img/grafana-cloud-3.png)
+
+Use the how-to of [Alex](https://inlets.dev/blog/2021/08/18/measure-and-monitor.html) for all the available metrics.
 
 ## Inlets
 
@@ -52,7 +219,7 @@ inletsctl download
 2021/08/16 01:11:11 https://github.com/inlets/inlets-pro/releases/tag/0.8.9
 Starting download of inlets-pro 0.8.9, this could take a few moments.
 Download completed, make sure that /usr/local/bin is on your path.
-  inlets-pro version
+inlets-pro version
 ```
 
 ### OCI API Keys
