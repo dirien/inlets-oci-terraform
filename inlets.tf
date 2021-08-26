@@ -96,6 +96,17 @@ resource "oci_core_security_list" "inlets-sec-list" {
       }
     }
   }
+  ingress_security_rules {
+    protocol = "6"
+    source = "0.0.0.0/0"
+    stateless = false
+    tcp_options {
+      source_port_range {
+        min = 1
+        max = 65535
+      }
+    }
+  }
   compartment_id = oci_identity_compartment.inlets-exit-node.id
   vcn_id = oci_core_vcn.inlets-vcn.id
 }
@@ -131,6 +142,7 @@ resource "oci_core_instance" "inlets-ubuntu-instance" {
       promUrl = var.prom-url
       promId = var.prom-id
       promPW = var.prom-pw
+      tunnelMode = var.tunnel-mode
     }))
     ssh_authorized_keys = file(var.ssh_public_key)
   }
@@ -138,6 +150,6 @@ resource "oci_core_instance" "inlets-ubuntu-instance" {
 }
 
 output "inlets-connection-string" {
-  value = "inlets-pro tcp client --url wss://${oci_core_instance.inlets-ubuntu-instance.public_ip}:8123 --token ${local.auth_token} --upstream $UPSTREAM --ports $PORTS"
+  value = format("inlets-pro ${var.tunnel-mode} client --url wss://${oci_core_instance.inlets-ubuntu-instance.public_ip}:8123 --token ${local.auth_token} --upstream $UPSTREAM %s", var.tunnel-mode != "http" ? "--ports $PORTS":"")
   sensitive = true
 }

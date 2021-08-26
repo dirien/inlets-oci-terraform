@@ -12,6 +12,10 @@ variable "prom-url" {}
 variable "prom-id" {}
 variable "prom-pw" {}
 
+variable "tunnel-mode" {
+  default = "http"
+}
+
 variable "inlets-version" {
   default = "0.9.0-rc2"
 }

@@ -73,6 +73,7 @@ curl -SLsf https://github.com/inlets/inlets-pro/releases/download/${version}/inl
   mv /tmp/inlets-pro /usr/local/bin/inlets-pro
 
 curl -SLsf https://github.com/inlets/inlets-pro/releases/download/${version}/inlets-pro.service -o inlets-pro.service && \
+  sed -i 's/tcp/${tunnelMode}/g' inlets-pro.service
   mv inlets-pro.service /etc/systemd/system/inlets-pro.service && \
   echo "AUTHTOKEN=$AUTHTOKEN" >> /etc/default/inlets-pro && \
   echo "IP=$IP" >> /etc/default/inlets-pro && \
